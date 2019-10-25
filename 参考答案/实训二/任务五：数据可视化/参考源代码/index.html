@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>手机数据分析实训二</title>
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/echarts.min.js"></script>
+
+</head>
+<style>
+    html , body , .content {
+    width:100%;
+    height:100%;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    background-color: #ccc;
+}
+.content {
+    padding: 40px;
+}
+.header {
+    height: 10%;
+    width: 100%;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 60px;
+    text-align: center;
+}
+.body {
+    height: 100%;
+    width: 100%;
+    text-align: center;
+}
+.chartBox {
+    width: 100%;
+    height: 80%;
+    margin-bottom:40px;
+}
+</style>
+<body>
+    <div class="content">
+        <div class="header">手机数据分析实训二</div>
+        <div class="body">
+            <div class="chartBox" id="timeChart"></div>
+            <div class="chartBox" id="channelChart"></div>
+            <div class="chartBox" id="scoreChart"></div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="/static/js/setTimeData.js"></script>
+<script>
+var nameBarr = [];
+    //销量排名前三的手机型号名称数组nameBarr
+var dateArr = [];
+    //销售时间数组dateArr
+var lineOneData = [];
+var lineTwoData = [];
+var lineThreeData = [];
+    //手机型号销售量排名前三的销售量数据数组lineOneData、lineTwoData、lineThreeData
+    //分别对应nameBarr手机名称数组中的nameBarr[0]、nameBarr[1]、nameBarr[2]的三款手机
+
+function setSeries(){
+        return [
+            {
+                name: nameBarr[0],
+                type: 'line',
+                areaStyle: {},
+                stack: '销售量',
+                data: lineOneData
+            },
+            {
+                name: nameBarr[1],
+                type: 'line',
+                areaStyle: {},
+                stack: '销售量',
+                data: lineTwoData
+            },
+            {
+                name: nameBarr[2],
+                type: 'line',
+                areaStyle: {},
+                stack: '销售量',
+                data: lineThreeData
+            }
+        ]
+    };
+
+//销售量排名前三的手机型号的销售高峰在哪个时间段数据数组
+var timeArr =[
+    [{% for r in tstc_res %} "{{r.fld_phone_name}}", {% endfor %}],
+    [{% for r in tstc_res %} "{{r.fld_sales_time}}", {% endfor %}],
+    [{% for r in tstc_res %} "{{r.fld_sale_count}}", {% endfor %}]
+   ];
+//销量排名前十的手机型号的销售渠道是什么数据数组
+var channelArr =[
+    [{% for r in tscc_res %} "{{r.fld_phone_name}}", {% endfor %}],
+    [{% for r in tscc_res %} "{{r.fld_sales_channel}}", {% endfor %}],
+    [{% for r in tscc_res %} "{{r.fld_sale_count}}", {% endfor %}]
+   ];
+//用户评分最高的10个手机型号是什么数据数组
+var scoreArr =[
+    [{% for r in tusc_res %} "{{r.fld_phone_name}}", {% endfor %}],
+    [{% for r in tusc_res %} "{{r.fld_user_score}}", {% endfor %}],
+   ];
+setTimeData(timeArr,nameBarr,dateArr,lineOneData,lineTwoData,lineThreeData);
+
+var timeChart = echarts.init(document.getElementById('timeChart'));
+var timeOption = {
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+        }
+    },
+    title:{
+        text:'销售量排名前三的手机型号的销售时间段'
+    },
+    legend: {
+        data: nameBarr
+    },
+    yAxis : {
+        type: 'value',
+        min:4
+    },
+    xAxis:{
+        type: 'category',
+        boundaryGap : false,
+        data: dateArr
+    },
+    series: setSeries(),
+    dataZoom: [
+        {
+            type: 'inside',
+            start: 0,
+            end: 100
+        },
+        {
+            start: 0,
+            end: 100,
+            handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+            handleSize: '80%',
+            handleStyle: {
+                color: '#fff',
+                shadowBlur: 3,
+                shadowColor: 'rgba(0, 0, 0, 0.6)',
+                shadowOffsetX: 2,
+                shadowOffsetY: 2
+            }
+        }
+    ]
+};
+timeChart.setOption(timeOption);
+
+</script>
+<script type="text/javascript" src="/static/js/index.js"></script>
+</html>

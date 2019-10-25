@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>手机数据分析实训一</title>
+    <script type="text/javascript" src="/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/echarts.min.js"></script>
+
+</head>
+<style>
+    html , body , .content {
+    width:100%;
+    height:100%;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    background-color: #ccc;
+}
+.content {
+    padding: 40px;
+}
+.header {
+    height: 10%;
+    width: 100%;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 60px;
+    text-align: center;
+}
+.body {
+    height: 100%;
+    width: 100%;
+    text-align: center;
+}
+.chartBox {
+    width: 100%;
+    height: 80%;
+    margin-bottom:40px;
+}
+</style>
+<body>
+    <div class="content">
+        <div class="header">手机数据分析实训一</div>
+        <div class="body">
+            <div class="chartBox" id="chartBox1"></div>
+            <div class="chartBox" id="chartBox2"></div>
+            <div class="chartBox" id="chartBox3"></div>
+        </div>
+    </div>
+</body>
+<script>
+var dom1 = "chartBox1";
+var dom2 = "chartBox2";
+var dom3 = "chartBox3";
+var chartObj1 = {};
+var chartObj2 = {};
+var chartObj3 = {};
+var dataArr1 = [];
+var dataArr2 = [];
+var dataArr3 = [];
+var option1 = {};
+var option2 = {};
+var option3 = {};
+
+initEcharts(dataArr1,dataArr2,dataArr3, dom1,dom2,dom3);
+
+setBarOption(dataArr1);
+setPieOption(dataArr2);
+setLineOption(dataArr3);
+
+draw(chartObj1,option1);
+draw(chartObj2,option2);
+draw(chartObj3,option3);
+
+console.log(dataArr1);
+console.log(dataArr1);
+console.log(dataArr3);
+
+
+
+    function initEcharts(data1,data2,data3, dom1,dom2,dom3) {
+        dataArr1 =[[{% for r in tpbc_res %} "{{r.fld_brand_name}}", {% endfor %}],[{% for r in tpbc_res %} {{r.fld_sale_count}}, {% endfor %}]];
+        dataArr2 = [ {% for r in tpcc_res %} {  value:{{r.fld_sale_count}} , name:"{{r.fld_phone_color}}"  } , {% endfor %} ];
+        dataArr3 =[[{% for r in tpsc_res %} "{{r.fld_phone_size}}" , {% endfor %}],[{% for r in tpsc_res %}{{r.fld_sale_count}},{% endfor %}]];
+        // 基于准备好的dom，初始化echarts实例
+        chartObj1 = echarts.init(document.getElementById(dom1));
+        chartObj2 = echarts.init(document.getElementById(dom2));
+        chartObj3 = echarts.init(document.getElementById(dom3));
+    }
+
+    function setBarOption(data) {
+        // 指定图表的配置项和数据
+        option1 = {
+            title: {
+                text: '手机的品牌对销量的影响'
+            },
+            grid:{
+                bottom:120
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{b}: {c}"
+            },
+            xAxis: {
+                axisLabel: {
+                   interval:0,
+                   rotate:40
+                },
+                data: dataArr1[0]
+            },
+            yAxis: {},
+            series: [{
+                name: '销量',
+                type: 'bar',
+                data: dataArr1[1]
+            }]
+        };
+    }
+
+    function setPieOption(data) {
+        // 指定图表的配置项和数据
+        option2 = {
+            title: {
+                text: '手机的颜色对销量的影响'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{b} : {c} ({d}%)"
+            },
+            series: [{
+                name: '销量',
+                type: 'pie',
+            	radius : '55%',
+            	center: ['50%', '60%'],
+            	itemStyle: {
+                    emphasis: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                },
+                data: dataArr2
+            }]
+        };
+    }
+
+    function setLineOption(data) {
+        // 指定图表的配置项和数据
+        option3 = {
+            title: {
+                text: '手机的尺寸对销量的影响'
+            },
+            tooltip : {
+                trigger: 'item',
+                formatter: "{b}: {c}"
+            },
+            xAxis: {
+                type: 'category',
+                axisLabel: {
+                   interval:0,
+                   rotate:40
+                },
+                data: dataArr3[0]
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [{
+                type: 'line',
+                data: dataArr3[1]
+
+            }]
+        };
+    }
+
+    function draw(chartObj,option){
+        // 使用刚指定的配置项和数据显示图表。
+        chartObj.setOption(option);
+    }
+</script>
+</html>
